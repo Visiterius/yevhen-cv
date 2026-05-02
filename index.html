@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yevhen Biedniakov — AI Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+<style>
+  :root {
+    --accent: #FFD519;
+    --accent-dim: #E6C017;
+    --dark: #080808;
+    --dark-2: #101010;
+    --dark-3: #161616;
+    --card: #111111;
+    --card-hover: #181818;
+    --card-border: rgba(255,255,255,0.07);
+    --white: #FFFFFF;
+    --gray: #555555;
+    --gray-mid: #888888;
+    --gray-light: #AAAAAA;
+    --text: #CCCCCC;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Inter', sans-serif; background: var(--dark); color: var(--text); overflow-x: hidden; }
+
+  #circuit { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+
+  model-viewer {
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    --poster-color: transparent;
+    --progress-bar-color: var(--accent);
+    --progress-bar-height: 2px;
+    --progress-mask: transparent;
+    outline: none;
+  }
+  model-viewer::part(default-progress-bar) { background-color: var(--accent); }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(8,8,8,0.88); backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    padding: 0 48px; height: 58px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .nav-logo { font-family: 'Unbounded', sans-serif; font-size: 12px; font-weight: 700; color: var(--white); letter-spacing: 0.08em; text-decoration: none; }
+  .nav-logo span { color: var(--accent); }
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a { color: var(--gray-mid); text-decoration: none; font-size: 12px; font-weight: 500; transition: color 0.2s; letter-spacing: 0.04em; text-transform: uppercase; }
+  .nav-links a:hover { color: var(--white); }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh; display: grid;
+    grid-template-columns: 1fr 500px;
+    align-items: center;
+    padding: 100px 48px 80px;
+    position: relative; overflow: hidden; gap: 40px;
+  }
+  .hero-line { position: absolute; top: 0; right: 0; width: 3px; height: 100%; background: var(--accent); opacity: 0.6; }
+  .hero-content { position: relative; z-index: 1; }
+
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 3px; padding: 6px 14px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--gray-light); margin-bottom: 32px;
+  }
+  .hero-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: blink 2s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+  .hero-name { font-family: 'Unbounded', sans-serif; font-size: clamp(36px, 6vw, 70px); font-weight: 900; color: var(--white); line-height: 1.0; letter-spacing: -0.03em; margin-bottom: 20px; }
+  .hero-name .surname { color: var(--accent); }
+  .hero-role { font-size: clamp(12px, 1.6vw, 15px); font-weight: 400; color: var(--gray-light); margin-bottom: 36px; letter-spacing: 0.02em; }
+  .hero-summary { font-size: 14px; line-height: 1.8; color: var(--text); margin-bottom: 44px; padding-left: 18px; border-left: 2px solid var(--accent); }
+
+  .hero-links { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 52px; }
+  .btn-primary { display: inline-flex; align-items: center; gap: 8px; background: var(--accent); color: #000; padding: 12px 22px; border-radius: 3px; font-weight: 700; font-size: 13px; text-decoration: none; letter-spacing: 0.04em; transition: background 0.2s, transform 0.15s; }
+  .btn-primary:hover { background: var(--accent-dim); transform: translateY(-1px); }
+  .btn-outline { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: var(--gray-light); border: 1px solid rgba(255,255,255,0.15); padding: 12px 22px; border-radius: 3px; font-weight: 500; font-size: 13px; text-decoration: none; letter-spacing: 0.03em; transition: border-color 0.2s, color 0.2s, transform 0.15s; }
+  .btn-outline:hover { border-color: var(--white); color: var(--white); transform: translateY(-1px); }
+
+  .hero-stats { display: flex; gap: 40px; flex-wrap: wrap; }
+  .stat-num { font-family: 'Unbounded', sans-serif; font-size: 28px; font-weight: 900; color: var(--accent); line-height: 1; margin-bottom: 5px; }
+  .stat-label { font-size: 10px; color: var(--gray); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 500; }
+
+  /* ── HERO 3D ── */
+  .hero-3d { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 12px; }
+  .viewer-label { font-family: 'Unbounded', sans-serif; font-size: 9px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 4px; }
+
+  .viewer-main {
+    border: 1px solid rgba(255,213,25,0.2);
+    border-radius: 6px;
+    overflow: hidden;
+    height: 480px;
+    position: relative;
+    background: radial-gradient(ellipse at center, rgba(255,213,25,0.03) 0%, transparent 70%), #080808;
+  }
+
+  .viewer-thumbs { display: flex; flex-direction: column; gap: 8px; }
+  .viewer-thumb {
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 4px;
+    overflow: hidden;
+    height: 120px;
+    background: #080808;
+    position: relative;
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.2s;
+    text-decoration: none;
+    display: block;
+  }
+  .viewer-thumb:hover { border-color: rgba(255,213,25,0.4); transform: translateX(-2px); }
+  .viewer-thumb-label {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%);
+    padding: 14px 12px 8px;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 9px; font-weight: 700; color: var(--accent);
+    letter-spacing: 0.1em; text-transform: uppercase;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .viewer-cta {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 14px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 4px;
+    text-decoration: none;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .viewer-cta:hover { border-color: rgba(255,213,25,0.3); background: rgba(255,213,25,0.04); }
+  .viewer-cta-icon { font-size: 18px; color: var(--accent); }
+  .viewer-cta-text { flex: 1; }
+  .viewer-cta-title { font-size: 12px; font-weight: 600; color: var(--white); margin-bottom: 2px; }
+  .viewer-cta-sub { font-size: 10px; color: var(--gray-mid); }
+  .viewer-cta-arrow { font-size: 16px; color: var(--accent); }
+
+  /* ── SECTIONS ── */
+  section { padding: 100px 48px; max-width: 1160px; margin: 0 auto; position: relative; z-index: 1; }
+  .sec-label { font-family: 'Unbounded', sans-serif; font-size: 9px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+  .sec-title { font-family: 'Unbounded', sans-serif; font-size: clamp(24px, 4vw, 40px); font-weight: 900; color: var(--white); letter-spacing: -0.02em; margin-bottom: 52px; line-height: 1.1; }
+  .divider { width: calc(100% - 96px); margin: 0 48px; height: 1px; background: rgba(255,255,255,0.06); position: relative; z-index: 1; }
+
+  /* ── PROJECTS ── */
+  .projects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(500px, 1fr)); gap: 1px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; overflow: hidden; }
+  .proj-card { background: var(--card); padding: 36px; position: relative; transition: background 0.2s; }
+  .proj-card:hover { background: var(--card-hover); }
+  .proj-card::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: var(--accent); transform: scaleX(0); transform-origin: left; transition: transform 0.3s; }
+  .proj-card:hover::after { transform: scaleX(1); }
+  .proj-tag { display: inline-block; font-size: 9px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px; border: 1px solid rgba(255,213,25,0.3); padding: 3px 10px; border-radius: 2px; }
+  .proj-tag.mono { color: var(--gray-mid); border-color: rgba(255,255,255,0.1); }
+  .proj-title { font-family: 'Unbounded', sans-serif; font-size: 15px; font-weight: 700; color: var(--white); margin-bottom: 12px; line-height: 1.35; letter-spacing: -0.01em; }
+  .proj-desc { font-size: 13.5px; color: var(--gray-light); line-height: 1.7; margin-bottom: 20px; }
+  .proj-bullets { list-style: none; margin-bottom: 20px; }
+  .proj-bullets li { font-size: 13px; color: var(--text); padding: 5px 0 5px 18px; position: relative; line-height: 1.6; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  .proj-bullets li:last-child { border-bottom: none; }
+  .proj-bullets li::before { content: '→'; position: absolute; left: 0; color: var(--accent); font-size: 11px; }
+  .proj-stack { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+  .tag { font-size: 10px; font-weight: 500; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: var(--gray-mid); padding: 3px 9px; border-radius: 2px; }
+  .proj-link { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; color: var(--gray-mid); text-decoration: none; letter-spacing: 0.04em; text-transform: uppercase; transition: color 0.2s; }
+  .proj-link:hover { color: var(--accent); }
+
+  /* ── 3D PORTFOLIO ── */
+  .models-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .model-card {
+    background: var(--card); border: 1px solid var(--card-border);
+    border-radius: 6px; overflow: hidden;
+    transition: border-color 0.25s, transform 0.2s;
+    position: relative;
+  }
+  .model-card:hover { border-color: rgba(255,213,25,0.25); transform: translateY(-2px); }
+  .model-viewer-wrap {
+    height: 280px;
+    background: radial-gradient(ellipse at center, rgba(255,213,25,0.03) 0%, transparent 70%), #060606;
+    position: relative;
+  }
+  .model-info { padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .model-name { font-family: 'Unbounded', sans-serif; font-size: 13px; font-weight: 700; color: var(--white); letter-spacing: -0.01em; }
+  .model-link { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 700; color: var(--accent); text-decoration: none; letter-spacing: 0.06em; text-transform: uppercase; transition: opacity 0.2s; white-space: nowrap; }
+  .model-link:hover { opacity: 0.7; }
+
+  .sketchfab-cta {
+    grid-column: 1 / -1;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 24px;
+    background: rgba(255,213,25,0.04);
+    border: 1px solid rgba(255,213,25,0.15);
+    border-radius: 6px;
+    text-decoration: none;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .sketchfab-cta:hover { background: rgba(255,213,25,0.08); border-color: rgba(255,213,25,0.3); }
+  .sketchfab-cta-left { display: flex; align-items: center; gap: 16px; }
+  .sketchfab-cta-icon { font-size: 28px; line-height: 1; color: var(--accent); }
+  .sketchfab-cta-title { font-family: 'Unbounded', sans-serif; font-size: 13px; font-weight: 700; color: var(--white); margin-bottom: 3px; }
+  .sketchfab-cta-sub { font-size: 12px; color: var(--gray-mid); }
+  .sketchfab-cta-right { font-size: 22px; color: var(--accent); }
+
+  /* ── EXPERIENCE ── */
+  .timeline { position: relative; padding-left: 28px; }
+  .timeline::before { content: ''; position: absolute; left: 0; top: 8px; bottom: 0; width: 1px; background: linear-gradient(to bottom, var(--accent), rgba(255,255,255,0.1)); }
+  .timeline-item { position: relative; margin-bottom: 48px; }
+  .timeline-dot { position: absolute; left: -34px; top: 7px; width: 12px; height: 12px; border-radius: 50%; background: var(--accent); border: 2px solid var(--dark); }
+  .timeline-dot.mono { background: var(--dark-3); border-color: var(--gray); }
+  .exp-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 8px; margin-bottom: 6px; }
+  .exp-title { font-family: 'Unbounded', sans-serif; font-size: 13px; font-weight: 700; color: var(--white); letter-spacing: -0.01em; }
+  .exp-date { font-size: 10px; font-weight: 700; color: var(--accent); letter-spacing: 0.06em; font-family: 'Unbounded', sans-serif; }
+  .exp-company { font-size: 12px; color: var(--gray-mid); margin-bottom: 14px; font-weight: 500; }
+  .exp-bullets { list-style: none; }
+  .exp-bullets li { font-size: 13.5px; color: var(--text); padding: 4px 0 4px 18px; position: relative; line-height: 1.65; }
+  .exp-bullets li::before { content: '·'; position: absolute; left: 0; color: var(--accent); font-size: 22px; line-height: 1; top: 2px; }
+
+  /* ── SKILLS ── */
+  .skills-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; overflow: hidden; }
+  .skill-group { background: var(--card); padding: 28px; transition: background 0.2s; }
+  .skill-group:hover { background: var(--card-hover); }
+  .skill-group-title { font-family: 'Unbounded', sans-serif; font-size: 9px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .skill-tags { display: flex; flex-wrap: wrap; gap: 7px; }
+  .skill-tag { font-size: 11px; font-weight: 500; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: var(--text); padding: 5px 11px; border-radius: 2px; transition: border-color 0.2s, color 0.2s; }
+  .skill-tag:hover { border-color: var(--accent); color: var(--accent); cursor: default; }
+
+  /* ── CONTACT ── */
+  #contact { background: rgba(16,16,16,0.9); border-top: 1px solid rgba(255,255,255,0.06); border-bottom: 1px solid rgba(255,255,255,0.06); position: relative; z-index: 1; }
+  .contact-inner { max-width: 1160px; margin: 0 auto; padding: 100px 48px; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+  .contact-links { display: flex; flex-direction: column; gap: 10px; }
+  .contact-item { display: flex; align-items: center; gap: 16px; padding: 18px 20px; background: var(--card); border: 1px solid rgba(255,255,255,0.07); border-radius: 4px; text-decoration: none; transition: border-color 0.2s, transform 0.15s; }
+  .contact-item:hover { border-color: rgba(255,213,25,0.3); transform: translateX(4px); }
+  .contact-icon { width: 36px; height: 36px; background: rgba(255,255,255,0.05); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; color: var(--gray-mid); }
+  .contact-label { font-size: 10px; color: var(--gray); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 2px; }
+  .contact-value { font-size: 13px; color: var(--white); font-weight: 500; }
+  .contact-item.sketchfab .contact-icon { background: rgba(255,213,25,0.08); color: var(--accent); }
+
+  footer { padding: 28px 48px; text-align: center; font-size: 11px; color: var(--gray); letter-spacing: 0.05em; border-top: 1px solid rgba(255,255,255,0.05); position: relative; z-index: 1; }
+  footer span { color: var(--accent); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; }
+    .hero-3d { display: none; }
+  }
+  @media (max-width: 768px) {
+    nav { padding: 0 20px; }
+    .nav-links { display: none; }
+    .hero { padding: 100px 20px 60px; }
+    section { padding: 60px 20px; }
+    .divider { width: calc(100% - 40px); margin: 0 20px; }
+    .projects-grid { grid-template-columns: 1fr; }
+    .skills-grid { grid-template-columns: 1fr; }
+    .models-grid { grid-template-columns: 1fr; }
+    .contact-inner { grid-template-columns: 1fr; gap: 40px; padding: 60px 20px; }
+    footer { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="circuit"></canvas>
+
+<nav>
+  <a href="#" class="nav-logo">YB · <span>AI</span></a>
+  <ul class="nav-links">
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#portfolio">3D Work</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="hero" style="position:relative;z-index:1">
+  <div class="hero-line"></div>
+
+  <div class="hero-content">
+    <div class="hero-badge">
+      <div class="hero-badge-dot"></div>
+      Available for AI Engineering roles · Netherlands &amp; Remote
+    </div>
+    <h1 class="hero-name">Yevhen<br><span class="surname">Biedniakov</span></h1>
+    <p class="hero-role">AI Engineer — LLM Systems · RAG Pipelines · Edge AI · Domain-Specific AI</p>
+    <p class="hero-summary">
+      Building production-grade local AI systems — offline, private, and GPU-powered.
+      7 years in dental CAD/CAM manufacturing,<br>now applying that domain expertise to build
+      AI that automates the same field. Specializing in RAG architecture, knowledge distillation,
+      and agentic retrieval.
+    </p>
+    <div class="hero-links">
+      <a href="https://github.com/Visiterius/offline-ai-rag-system" target="_blank" class="btn-primary">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+        View on GitHub
+      </a>
+      <a href="https://linkedin.com/in/yevhen-biedniakov" target="_blank" class="btn-outline">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        LinkedIn
+      </a>
+      <a href="mailto:visiterius@protonmail.com" class="btn-outline">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Email
+      </a>
+      <a href="https://sketchfab.com/visiterchik/models" target="_blank" class="btn-outline">⬡ 3D Models</a>
+    </div>
+    <div class="hero-stats">
+      <div><div class="stat-num">4</div><div class="stat-label">AI Projects Built</div></div>
+      <div><div class="stat-num">7+</div><div class="stat-label">Years Domain Exp.</div></div>
+      <div><div class="stat-num">NL</div><div class="stat-label">Based · Remote OK</div></div>
+      <div><div class="stat-num">Now</div><div class="stat-label">Available</div></div>
+    </div>
+  </div>
+
+  <!-- HERO 3D PANEL -->
+  <div class="hero-3d">
+    <div class="viewer-label">3D CAD Portfolio — Dental Frameworks</div>
+
+    <div class="viewer-main">
+      <model-viewer
+        src="models/over_ibar.glb"
+        alt="Over-IBar dental framework"
+        auto-rotate auto-rotate-delay="0" rotation-per-second="20deg"
+        camera-controls disable-zoom interaction-prompt="none"
+        shadow-intensity="0.8" shadow-softness="0.7" exposure="1.0"
+        environment-image="https://modelviewer.dev/shared-assets/environments/aircraft_workshop_01_1k.hdr" tone-mapping="aces">
+      </model-viewer>
+    </div>
+
+    <div class="viewer-thumbs">
+      <a href="https://sketchfab.com/3d-models/ibar-8bbfa746a9954add82c0eda3cd0bb438" target="_blank" class="viewer-thumb">
+        <model-viewer
+          src="models/ibar.glb" alt="IBar"
+          auto-rotate auto-rotate-delay="0" rotation-per-second="15deg"
+          interaction-prompt="none" disable-zoom disable-pan disable-tap
+          shadow-intensity="0.6" exposure="0.9"
+          environment-image="https://modelviewer.dev/shared-assets/environments/aircraft_workshop_01_1k.hdr" tone-mapping="aces"
+          style="pointer-events: none;">
+        </model-viewer>
+        <div class="viewer-thumb-label">IBar</div>
+      </a>
+      <a href="https://sketchfab.com/3d-models/titan-407644905bf840b48313b829f3921110" target="_blank" class="viewer-thumb">
+        <model-viewer
+          src="models/titan.glb" alt="Titan"
+          auto-rotate auto-rotate-delay="0" rotation-per-second="15deg"
+          interaction-prompt="none" disable-zoom disable-pan disable-tap
+          shadow-intensity="0.6" exposure="0.9"
+          environment-image="https://modelviewer.dev/shared-assets/environments/aircraft_workshop_01_1k.hdr" tone-mapping="aces"
+          style="pointer-events: none;">
+        </model-viewer>
+        <div class="viewer-thumb-label">Titan</div>
+      </a>
+      <a href="https://sketchfab.com/3d-models/ul-b2188c61bf724dab9e96f0acffe8812e" target="_blank" class="viewer-thumb">
+        <model-viewer
+          src="models/ul.glb" alt="UL"
+          auto-rotate auto-rotate-delay="0" rotation-per-second="15deg"
+          interaction-prompt="none" disable-zoom disable-pan disable-tap
+          shadow-intensity="0.6" exposure="0.9"
+          environment-image="https://modelviewer.dev/shared-assets/environments/aircraft_workshop_01_1k.hdr" tone-mapping="aces"
+          style="pointer-events: none;">
+        </model-viewer>
+        <div class="viewer-thumb-label">UL</div>
+      </a>
+    </div>
+
+    <a href="https://sketchfab.com/visiterchik/models" target="_blank" class="viewer-cta">
+      <div class="viewer-cta-icon">⬡</div>
+      <div class="viewer-cta-text">
+        <div class="viewer-cta-title">View full 3D portfolio</div>
+        <div class="viewer-cta-sub">sketchfab.com/visiterchik · CC Attribution</div>
+      </div>
+      <div class="viewer-cta-arrow">↗</div>
+    </a>
+  </div>
+</div>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="sec-label">Portfolio</div>
+  <h2 class="sec-title">AI Projects</h2>
+  <div class="projects-grid">
+    <div class="proj-card">
+      <div class="proj-tag">Flagship · In Development</div>
+      <div class="proj-title">Dental Framework AI Design Agent</div>
+      <div class="proj-desc">Domain-specific AI pipeline automating RPD metal framework design — trained on 500GB of real production data from thousands of clinical cases.</div>
+      <ul class="proj-bullets">
+        <li>Reverse-engineered proprietary 3Shape XML schema to extract structured design parameters across thousands of production cases</li>
+        <li>Hybrid RAG: dense (e5-large-v2) + sparse (BM25) with reranking and reciprocal rank fusion</li>
+        <li>Knowledge distillation: cloud teachers (Nemotron, Claude) → local student (Gemma 4 E4B, 2.4GB VRAM)</li>
+        <li>AI generates design parameter files directly — no fragile GUI automation needed</li>
+        <li>Fully offline on RTX 4070 8GB — GDPR-compliant medical workflow</li>
+      </ul>
+      <div class="proj-stack">
+        <span class="tag">Python</span><span class="tag">lxml</span><span class="tag">SQLite</span>
+        <span class="tag">FAISS</span><span class="tag">Ollama</span><span class="tag">Gemma 4</span>
+        <span class="tag">sentence-transformers</span><span class="tag">trimesh</span><span class="tag">PyMeshLab</span>
+      </div>
+    </div>
+    <div class="proj-card">
+      <div class="proj-tag">Open Source</div>
+      <div class="proj-title">Offline RAG System — Agentic Multi-Document Retrieval</div>
+      <div class="proj-desc">Production-ready local RAG pipeline with GPU inference. No cloud, no API keys, no data leaving your machine.</div>
+      <ul class="proj-bullets">
+        <li>Agentic query decomposition: LLM breaks complex questions into sub-queries for improved cross-document recall</li>
+        <li>Hybrid retrieval with re-ranking, deduplication, and similarity threshold filtering</li>
+        <li>Source attribution with file name + page number; persistent conversation memory</li>
+        <li>Tested across 50+ documents with sub-second retrieval latency on local GPU</li>
+      </ul>
+      <div class="proj-stack">
+        <span class="tag">Python</span><span class="tag">FAISS</span>
+        <span class="tag">e5-large-v2</span><span class="tag">Ollama</span>
+        <span class="tag">NumPy</span><span class="tag">PyPDF</span>
+      </div>
+      <a href="https://github.com/Visiterius/offline-ai-rag-system" target="_blank" class="proj-link">↗ github.com/Visiterius/offline-ai-rag-system</a>
+    </div>
+    <div class="proj-card">
+      <div class="proj-tag mono">Voice AI</div>
+      <div class="proj-title">Multi-Language Voice AI System</div>
+      <div class="proj-desc">Real-time multilingual voice recognition and response pipeline. Provider-neutral — swap models without changing the pipeline.</div>
+      <ul class="proj-bullets">
+        <li>Whisper-powered transcription with Claude API for generation</li>
+        <li>Supports multiple languages with real-time processing</li>
+        <li>Modular architecture: any transcription or generation model can be swapped in</li>
+      </ul>
+      <div class="proj-stack"><span class="tag">Python</span><span class="tag">Whisper</span><span class="tag">Claude API</span><span class="tag">TypeScript</span></div>
+    </div>
+    <div class="proj-card">
+      <div class="proj-tag mono">Edge AI</div>
+      <div class="proj-title">Offline Chatbots — Raspberry Pi &amp; Android</div>
+      <div class="proj-desc">LLM inference on the absolute edge — no internet, no cloud, running on a $35 computer and a mobile phone.</div>
+      <ul class="proj-bullets">
+        <li>Deployed on Raspberry Pi and Pixel 7 with zero internet dependency</li>
+        <li>Quantized model selection optimized for constrained RAM and CPU</li>
+        <li>AI without the cloud — private, fast, deployable anywhere</li>
+      </ul>
+      <div class="proj-stack"><span class="tag">Python</span><span class="tag">Ollama</span><span class="tag">faster-whisper</span><span class="tag">Android</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 3D PORTFOLIO -->
+<section id="portfolio">
+  <div class="sec-label">CAD / 3D Work</div>
+  <h2 class="sec-title">Dental Framework<br>3D Portfolio</h2>
+  <div class="models-grid">
+    <div class="model-card">
+      <div class="model-viewer-wrap">
+        <model-viewer src="models/over_ibar.glb" alt="Over-IBar"
+          auto-rotate auto-rotate-delay="0" rotation-per-second="20deg"
+          camera-controls interaction-prompt="none"
+          shadow-intensity="0.8" exposure="1.0" environment-image="https://modelviewer.dev/shared-assets/environments/aircraft_workshop_01_1k.hdr" tone-mapping="aces"></model-viewer>
+      </div>
+      <div class="model-info">
+        <div class="model-name">Over-IBar</div>
+        <a href="https://sketchfab.com/3d-models/over-ibar-12ee49fc03b04859b4025936f86f75ec" target="_blank" class="model-link">↗ Sketchfab</a>
+      </div>
+    </div>
+    <div class="model-card">
+      <div class="model-viewer-wrap">
+        <model-viewer src="models/ibar.glb" alt="IBar"
+          auto-rotate auto-rotate-delay="0" rotation-per-second="20deg"
+          camera-controls interaction-prompt="none"
+          shadow-intensity="0.8" exposure="1.0" environment-image="https://modelviewer.dev/shared-assets/environments/aircraft_workshop_01_1k.hdr" tone-mapping="aces"></model-viewer>
+      </div>
+      <div class="model-info">
+        <div class="model-name">IBar</div>
+        <a href="https://sketchfab.com/3d-models/ibar-8bbfa746a9954add82c0eda3cd0bb438" target="_blank" class="model-link">↗ Sketchfab</a>
+      </div>
+    </div>
+    <div class="model-card">
+      <div class="model-viewer-wrap">
+        <model-viewer src="models/titan.glb" alt="Titan"
+          auto-rotate auto-rotate-delay="0" rotation-per-second="20deg"
+          camera-controls interaction-prompt="none"
+          shadow-intensity="0.8" exposure="1.0" environment-image="https://modelviewer.dev/shared-assets/environments/aircraft_workshop_01_1k.hdr" tone-mapping="aces"></model-viewer>
+      </div>
+      <div class="model-info">
+        <div class="model-name">Lower full arch All-on-X</div>
+        <a href="https://sketchfab.com/3d-models/titan-407644905bf840b48313b829f3921110" target="_blank" class="model-link">↗ Sketchfab</a>
+      </div>
+    </div>
+    <div class="model-card">
+      <div class="model-viewer-wrap">
+        <model-viewer src="models/ul.glb" alt="UL"
+          auto-rotate auto-rotate-delay="0" rotation-per-second="20deg"
+          camera-controls interaction-prompt="none"
+          shadow-intensity="0.8" exposure="1.0" environment-image="https://modelviewer.dev/shared-assets/environments/aircraft_workshop_01_1k.hdr" tone-mapping="aces"></model-viewer>
+      </div>
+      <div class="model-info">
+        <div class="model-name">Upper full arch All-on-X</div>
+        <a href="https://sketchfab.com/3d-models/ul-b2188c61bf724dab9e96f0acffe8812e" target="_blank" class="model-link">↗ Sketchfab</a>
+      </div>
+    </div>
+    <a href="https://sketchfab.com/visiterchik/models" target="_blank" class="sketchfab-cta">
+      <div class="sketchfab-cta-left">
+        <div class="sketchfab-cta-icon">⬡</div>
+        <div>
+          <div class="sketchfab-cta-title">View full portfolio on Sketchfab</div>
+          <div class="sketchfab-cta-sub">sketchfab.com/visiterchik · All models CC Attribution · Commercial use permitted</div>
+        </div>
+      </div>
+      <div class="sketchfab-cta-right">↗</div>
+    </a>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="sec-label">Career</div>
+  <h2 class="sec-title">Experience</h2>
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="exp-header">
+        <div class="exp-title">CAD/CAM Specialist</div>
+        <div class="exp-date">Dec 2025 — Present</div>
+      </div>
+      <div class="exp-company">Unique Metal 3D Printing · Achterveld, Netherlands · On-site</div>
+      <ul class="exp-bullets">
+        <li>Designing dental frameworks using 3Shape Dental Designer; EOSINT M270 laser sintering of CoCr frameworks</li>
+        <li>Software maintenance and CAD/CAM team training — maintaining domain expertise while developing AI systems in parallel</li>
+      </ul>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="exp-header">
+        <div class="exp-title">Dental CAD/CAM Specialist — Software &amp; Systems</div>
+        <div class="exp-date">Dec 2023 — Aug 2025</div>
+      </div>
+      <div class="exp-company">Lintec Dental Labs · Maryland, USA · Remote</div>
+      <ul class="exp-bullets">
+        <li>Designed full-arch implant prosthetics: All-on-X restorations, bridges, immediate load surgical temporaries</li>
+        <li>Built and maintained Exocad libraries: STL organization, implant component configuration, workflow automation</li>
+        <li>Technical owner of digital department — CAD software config, troubleshooting, system updates</li>
+        <li>Photogrammetry-based alignment for precise implant positioning and passive framework fit</li>
+      </ul>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot mono"></div>
+      <div class="exp-header">
+        <div class="exp-title">Web Developer</div>
+        <div class="exp-date">2016 — 2019</div>
+      </div>
+      <div class="exp-company">Freelance</div>
+      <ul class="exp-bullets">
+        <li>Built responsive web applications using React and TypeScript</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="sec-label">Stack</div>
+  <h2 class="sec-title">Technical Skills</h2>
+  <div class="skills-grid">
+    <div class="skill-group">
+      <div class="skill-group-title">Languages</div>
+      <div class="skill-tags"><span class="skill-tag">Python</span><span class="skill-tag">TypeScript</span><span class="skill-tag">JavaScript</span></div>
+    </div>
+    <div class="skill-group">
+      <div class="skill-group-title">AI / ML</div>
+      <div class="skill-tags">
+        <span class="skill-tag">RAG Pipelines</span><span class="skill-tag">LLM Integration</span>
+        <span class="skill-tag">Vector Search</span><span class="skill-tag">Embeddings</span>
+        <span class="skill-tag">Prompt Engineering</span><span class="skill-tag">Knowledge Distillation</span>
+        <span class="skill-tag">Query Decomposition</span><span class="skill-tag">Agent Orchestration</span>
+        <span class="skill-tag">Reranking</span><span class="skill-tag">Hybrid Retrieval</span>
+      </div>
+    </div>
+    <div class="skill-group">
+      <div class="skill-group-title">Tools &amp; Libraries</div>
+      <div class="skill-tags">
+        <span class="skill-tag">FAISS</span><span class="skill-tag">Ollama</span>
+        <span class="skill-tag">sentence-transformers</span><span class="skill-tag">Whisper</span>
+        <span class="skill-tag">faster-whisper</span><span class="skill-tag">PyTorch</span>
+        <span class="skill-tag">NumPy</span><span class="skill-tag">lxml</span>
+        <span class="skill-tag">SQLite</span><span class="skill-tag">trimesh</span><span class="skill-tag">PyMeshLab</span>
+      </div>
+    </div>
+    <div class="skill-group">
+      <div class="skill-group-title">Infrastructure</div>
+      <div class="skill-tags">
+        <span class="skill-tag">Docker</span><span class="skill-tag">Git</span>
+        <span class="skill-tag">WSL / Linux</span><span class="skill-tag">Conda</span>
+        <span class="skill-tag">Raspberry Pi</span><span class="skill-tag">Android Edge</span>
+      </div>
+    </div>
+    <div class="skill-group">
+      <div class="skill-group-title">Domain — CAD/CAM</div>
+      <div class="skill-tags">
+        <span class="skill-tag">3Shape Dental Designer</span><span class="skill-tag">Exocad</span>
+        <span class="skill-tag">Blender</span><span class="skill-tag">EOS/EOSINT Systems</span>
+        <span class="skill-tag">XML Reverse Engineering</span><span class="skill-tag">Medical Data Workflows</span>
+      </div>
+    </div>
+    <div class="skill-group">
+      <div class="skill-group-title">Frontend</div>
+      <div class="skill-tags"><span class="skill-tag">React</span><span class="skill-tag">TypeScript</span><span class="skill-tag">HTML / CSS</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<div id="contact">
+  <div class="contact-inner">
+    <div>
+      <div class="sec-label">Get in touch</div>
+      <h2 class="sec-title" style="margin-bottom:20px">Let's build<br>something.</h2>
+      <p style="font-size:15px;line-height:1.8;color:var(--gray-light);max-width:420px">
+        Open to AI engineering roles in the Netherlands and worldwide remote.
+        Especially interested in domain-specific AI, medical tech, and privacy-first offline systems.
+      </p>
+    </div>
+    <div class="contact-links">
+      <a href="mailto:visiterius@protonmail.com" class="contact-item">
+        <div class="contact-icon">✉</div>
+        <div><div class="contact-label">Email</div><div class="contact-value">visiterius@protonmail.com</div></div>
+      </a>
+      <a href="https://linkedin.com/in/yevhen-biedniakov" target="_blank" class="contact-item">
+        <div class="contact-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></div>
+        <div><div class="contact-label">LinkedIn</div><div class="contact-value">linkedin.com/in/yevhen-biedniakov</div></div>
+      </a>
+      <a href="https://github.com/Visiterius" target="_blank" class="contact-item">
+        <div class="contact-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg></div>
+        <div><div class="contact-label">GitHub</div><div class="contact-value">github.com/Visiterius</div></div>
+      </a>
+      <a href="https://sketchfab.com/visiterchik/models" target="_blank" class="contact-item sketchfab">
+        <div class="contact-icon">⬡</div>
+        <div><div class="contact-label">3D Portfolio</div><div class="contact-value">sketchfab.com/visiterchik</div></div>
+      </a>
+      <div class="contact-item" style="cursor:default">
+        <div class="contact-icon">◎</div>
+        <div><div class="contact-label">Location</div><div class="contact-value">Hilversum, Netherlands · Open to remote</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>Yevhen <span>Biedniakov</span> · AI Engineer · 2025</footer>
+
+<script>
+(function () {
+  const canvas = document.getElementById('circuit');
+  const ctx = canvas.getContext('2d');
+  const GRID = 52, NODE_PROB = 0.28;
+  let W, H, segments, nodes, pulses;
+
+  function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; build(); }
+
+  function build() {
+    const cols = Math.ceil(W / GRID) + 2, rows = Math.ceil(H / GRID) + 2;
+    const grid = []; segments = []; nodes = []; pulses = [];
+    for (let r = 0; r < rows; r++) { grid[r] = []; for (let c = 0; c < cols; c++) grid[r][c] = Math.random() < NODE_PROB; }
+    for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) if (grid[r][c]) nodes.push({ x: c * GRID, y: r * GRID });
+    for (let r = 0; r < rows; r++) { let p = -1; for (let c = 0; c < cols; c++) { if (grid[r][c]) { if (p >= 0 && c - p > 1 && Math.random() < 0.5) segments.push({ x1: p*GRID, y1: r*GRID, x2: c*GRID, y2: r*GRID }); p = c; } } }
+    for (let c = 0; c < cols; c++) { let p = -1; for (let r = 0; r < rows; r++) { if (grid[r][c]) { if (p >= 0 && r - p > 1 && Math.random() < 0.5) segments.push({ x1: c*GRID, y1: p*GRID, x2: c*GRID, y2: r*GRID }); p = r; } } }
+    for (let i = 0; i < 8; i++) spawnPulse();
+  }
+
+  function spawnPulse() {
+    if (!segments.length) return;
+    const seg = segments[Math.floor(Math.random() * segments.length)];
+    const dx = seg.x2 - seg.x1, dy = seg.y2 - seg.y1;
+    const length = Math.sqrt(dx*dx + dy*dy);
+    if (length < 1) return;
+    pulses.push({ seg, t: Math.random(), speed: 40 + Math.random()*60, tail: 0.25 + Math.random()*0.2, alpha: 0.4 + Math.random()*0.5, length });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    ctx.strokeStyle = 'rgba(255,255,255,0.04)'; ctx.lineWidth = 1;
+    for (const s of segments) { ctx.beginPath(); ctx.moveTo(s.x1, s.y1); ctx.lineTo(s.x2, s.y2); ctx.stroke(); }
+    for (const n of nodes) { ctx.beginPath(); ctx.arc(n.x, n.y, 1.4, 0, Math.PI*2); ctx.fillStyle = 'rgba(255,255,255,0.06)'; ctx.fill(); }
+    for (const p of pulses) {
+      const { seg, t, tail, alpha } = p;
+      const t0 = Math.max(0, t - tail), t1 = Math.min(1, t);
+      if (t0 >= t1) continue;
+      const ax = seg.x1+(seg.x2-seg.x1)*t0, ay = seg.y1+(seg.y2-seg.y1)*t0;
+      const bx = seg.x1+(seg.x2-seg.x1)*t1, by = seg.y1+(seg.y2-seg.y1)*t1;
+      const g = ctx.createLinearGradient(ax,ay,bx,by);
+      g.addColorStop(0,'rgba(255,213,25,0)'); g.addColorStop(0.6,`rgba(255,213,25,${0.25*alpha})`); g.addColorStop(1,`rgba(255,213,25,${0.55*alpha})`);
+      ctx.beginPath(); ctx.moveTo(ax,ay); ctx.lineTo(bx,by); ctx.strokeStyle=g; ctx.lineWidth=1.5; ctx.stroke();
+      ctx.beginPath(); ctx.arc(bx,by,2.5,0,Math.PI*2); ctx.fillStyle=`rgba(255,213,25,${0.65*alpha})`; ctx.fill();
+    }
+  }
+
+  let last = performance.now();
+  function loop(now) {
+    const dt = Math.min((now-last)/1000, 0.05); last = now;
+    for (let i = pulses.length-1; i >= 0; i--) {
+      const p = pulses[i]; p.t += p.speed/p.length*dt;
+      if (p.t - p.tail > 1) { pulses.splice(i,1); spawnPulse(); }
+    }
+    draw(); requestAnimationFrame(loop);
+  }
+
+  window.addEventListener('resize', resize);
+  resize(); requestAnimationFrame(loop);
+})();
+
+const navLinks = document.querySelectorAll('.nav-links a');
+const sections = document.querySelectorAll('section[id], div[id]');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => { if (window.scrollY >= s.offsetTop - 80) current = s.id; });
+  navLinks.forEach(a => { a.style.color = a.getAttribute('href') === '#' + current ? '#FFD519' : ''; });
+});
+</script>
+
+<script>
+// ── APPLY CHROME / CoCr METAL MATERIAL TO ALL DENTAL MODELS ──
+(function() {
+  function applyChrome(mv) {
+    if (!mv.model || !mv.model.materials) return;
+    mv.model.materials.forEach(mat => {
+      try {
+        const pbr = mat.pbrMetallicRoughness;
+        pbr.setMetallicFactor(0.95);
+        pbr.setRoughnessFactor(0.22);
+        pbr.setBaseColorFactor([0.78, 0.79, 0.81, 1.0]);
+      } catch (e) {}
+    });
+  }
+  function init() {
+    document.querySelectorAll('model-viewer').forEach(mv => {
+      if (mv.loaded) applyChrome(mv);
+      mv.addEventListener('load', () => applyChrome(mv));
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>
