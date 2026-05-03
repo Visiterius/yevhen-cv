@@ -841,10 +841,10 @@ if (container) {
     const size = box.getSize(new THREE.Vector3()).length();
     const center = box.getCenter(new THREE.Vector3());
     model.position.sub(center);
-    const scale = 9 / size;
+    const scale = 3 / size;
     model.scale.setScalar(scale);
     // Shift to left-center area of viewport
-    model.position.x = -1.2;
+    model.position.x = 1.2;
     // Initial perspective tilt — matches screenshot (looking down on the arch)
     model.rotation.x = -Math.PI / 3;
 
