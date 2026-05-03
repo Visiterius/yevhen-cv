@@ -30,6 +30,8 @@
   body { font-family: 'Inter', sans-serif; background: var(--dark); color: var(--text); overflow-x: hidden; }
 
   #circuit { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+  #three-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0.55; }
+  #three-bg canvas { display: block; }
 
   model-viewer {
     width: 100%;
@@ -267,6 +269,7 @@
 <body>
 
 <canvas id="circuit"></canvas>
+<div id="three-bg"></div>
 
 <nav>
   <a href="#" class="nav-logo">YB · <span>AI</span></a>
@@ -724,23 +727,48 @@ window.addEventListener('scroll', () => {
 </script>
 
 <script>
-// ── APPLY CHROME / CoCr METAL MATERIAL TO ALL DENTAL MODELS ──
+// ── APPLY MATERIALS PER MODEL ──
+// Porcelain ceramic for over-ibar / titan / ul, metal CoCr for ibar
 (function() {
-  function applyChrome(mv) {
+  // Porcelain: warm off-white, low metallic, medium roughness, slight clearcoat
+  const PORCELAIN = {
+    metallic: 0.0,
+    roughness: 0.45,
+    color: [0.96, 0.94, 0.90, 1.0],     // warm porcelain off-white
+    emissive: [0.03, 0.025, 0.02]        // subtle warmth
+  };
+  // CoCr metal (kept for ibar)
+  const METAL = {
+    metallic: 0.95,
+    roughness: 0.22,
+    color: [0.78, 0.79, 0.81, 1.0],
+    emissive: [0, 0, 0]
+  };
+
+  function detectMaterial(mv) {
+    const src = (mv.getAttribute('src') || '').toLowerCase();
+    if (src.includes('ibar.glb') && !src.includes('over')) return METAL;
+    return PORCELAIN; // over_ibar, titan, ul → porcelain
+  }
+
+  function applyMaterial(mv) {
     if (!mv.model || !mv.model.materials) return;
+    const m = detectMaterial(mv);
     mv.model.materials.forEach(mat => {
       try {
         const pbr = mat.pbrMetallicRoughness;
-        pbr.setMetallicFactor(0.95);
-        pbr.setRoughnessFactor(0.22);
-        pbr.setBaseColorFactor([0.78, 0.79, 0.81, 1.0]);
+        pbr.setMetallicFactor(m.metallic);
+        pbr.setRoughnessFactor(m.roughness);
+        pbr.setBaseColorFactor(m.color);
+        if (mat.setEmissiveFactor) mat.setEmissiveFactor(m.emissive);
       } catch (e) {}
     });
   }
+
   function init() {
     document.querySelectorAll('model-viewer').forEach(mv => {
-      if (mv.loaded) applyChrome(mv);
-      mv.addEventListener('load', () => applyChrome(mv));
+      if (mv.loaded) applyMaterial(mv);
+      mv.addEventListener('load', () => applyMaterial(mv));
     });
   }
   if (document.readyState === 'loading') {
@@ -749,6 +777,97 @@ window.addEventListener('scroll', () => {
     init();
   }
 })();
+</script>
+
+<!-- ── THREE.JS SPINNING GLASS BACKGROUND ── -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+const container = document.getElementById('three-bg');
+if (container) {
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 1000);
+  camera.position.set(0, 0, 8);
+
+  const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.0;
+  container.appendChild(renderer.domElement);
+
+  // Environment for glass reflections
+  const pmremGenerator = new THREE.PMREMGenerator(renderer);
+  scene.environment = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
+
+  // Glass material
+  const glassMat = new THREE.MeshPhysicalMaterial({
+    color: 0xffffff,
+    metalness: 0,
+    roughness: 0.05,
+    transmission: 1.0,         // full transparency / refraction
+    transparent: true,
+    opacity: 0.18,             // very low opacity per request
+    ior: 1.45,
+    thickness: 0.5,
+    clearcoat: 1.0,
+    clearcoatRoughness: 0.1,
+    attenuationColor: new THREE.Color(0xffd519),
+    attenuationDistance: 4.0,
+    side: THREE.DoubleSide
+  });
+
+  let model;
+  const loader = new GLTFLoader();
+  loader.load('models/over_ibar.glb', (gltf) => {
+    model = gltf.scene;
+    // Apply glass material to all meshes
+    model.traverse(child => {
+      if (child.isMesh) child.material = glassMat;
+    });
+
+    // Scale to fit viewport — make it BIG
+    const box = new THREE.Box3().setFromObject(model);
+    const size = box.getSize(new THREE.Vector3()).length();
+    const center = box.getCenter(new THREE.Vector3());
+    model.position.sub(center);
+    const scale = 6 / size;
+    model.scale.setScalar(scale);
+
+    scene.add(model);
+  });
+
+  // Subtle accent rim light
+  const rim = new THREE.DirectionalLight(0xffd519, 0.4);
+  rim.position.set(-5, 3, -5);
+  scene.add(rim);
+
+  function animate() {
+    requestAnimationFrame(animate);
+    if (model) {
+      model.rotation.y += 0.003;
+      model.rotation.x = Math.sin(Date.now() * 0.0002) * 0.15;
+    }
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+}
 </script>
 </body>
 </html>
