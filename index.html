@@ -845,6 +845,8 @@ if (container) {
     model.scale.setScalar(scale);
     // Shift to left-center area of viewport
     model.position.x = -1.2;
+    // Initial perspective tilt — matches screenshot (looking down on the arch)
+    model.rotation.x = -Math.PI / 3;
 
     scene.add(model);
   });
@@ -857,8 +859,9 @@ if (container) {
   function animate() {
     requestAnimationFrame(animate);
     if (model) {
-      model.rotation.y += 0.003;
-      model.rotation.x = Math.sin(Date.now() * 0.0002) * 0.15;
+      model.rotation.y += 0.0015;
+      // Fixed forward tilt (~ -60°) — matches the screenshot perspective
+      model.rotation.x = -Math.PI / 3;
     }
     renderer.render(scene, camera);
   }
