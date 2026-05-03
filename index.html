@@ -841,7 +841,7 @@ if (container) {
     const size = box.getSize(new THREE.Vector3()).length();
     const center = box.getCenter(new THREE.Vector3());
     model.position.sub(center);
-    const scale = 19 / size;
+    const scale = 9 / size;
     model.scale.setScalar(scale);
     // Shift to left-center area of viewport
     model.position.x = -1.2;
