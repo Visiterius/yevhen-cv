@@ -841,7 +841,7 @@ if (container) {
     const size = box.getSize(new THREE.Vector3()).length();
     const center = box.getCenter(new THREE.Vector3());
     model.position.sub(center);
-    const scale = 11 / size;
+    const scale = 19 / size;
     model.scale.setScalar(scale);
     // Shift to left-center area of viewport
     model.position.x = -1.2;
@@ -859,7 +859,7 @@ if (container) {
   function animate() {
     requestAnimationFrame(animate);
     if (model) {
-      model.rotation.y += 0.0015;
+      model.rotation.y += 0.0009;
       // Fixed forward tilt (~ -60°) — matches the screenshot perspective
       model.rotation.x = -Math.PI / 3;
     }
