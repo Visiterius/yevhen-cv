@@ -158,8 +158,23 @@
   .hero-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: blink 2s infinite; }
   @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
 
-  .hero-name { font-family: 'Unbounded', sans-serif; font-size: clamp(36px, 6vw, 70px); font-weight: 900; color: var(--white); line-height: 1.0; letter-spacing: -0.03em; margin-bottom: 20px; transition: color 0.4s; }
-  .hero-name .surname { color: var(--accent); }
+  .hero-name { font-family: 'Unbounded', sans-serif; font-size: clamp(36px, 6vw, 70px); font-weight: 900; color: var(--white); line-height: 1.0; letter-spacing: -0.03em; margin-bottom: 20px; transition: color 0.4s; display: flex; flex-direction: column; align-items: flex-start; gap: 0.04em; }
+  .hero-name .surname { display: block; color: var(--accent); line-height: 0.82; }
+  /* First name as a true unioned glyph outline (overlaps merged via boolean union,
+     interior fully transparent). Avoids text-stroke's internal contour seams entirely.
+     Water-wave fill rises inside the transparent outline. */
+  .hero-name .wave-name { position: relative; display: block; color: var(--accent); }
+  .hero-name .name-fill,
+  .hero-name .name-outline { display: block; height: 0.818em; width: auto; overflow: visible; }
+  .hero-name .name-outline { position: absolute; top: 0; left: 0; }
+  .hero-name .name-fill { color: var(--accent); animation: waterwave 4s ease-in-out infinite; }
+  @keyframes waterwave {
+    0%, 100% { clip-path: polygon(0% 45%, 16% 44%, 33% 50%, 54% 60%, 70% 61%, 84% 59%, 100% 52%, 100% 100%, 0% 100%); }
+    50%      { clip-path: polygon(0% 60%, 15% 65%, 34% 66%, 51% 62%, 67% 50%, 84% 45%, 100% 46%, 100% 100%, 0% 100%); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-name .name-fill { animation: none; clip-path: none; }
+  }
   .hero-role { font-size: clamp(15px, 1.9vw, 18px); font-weight: 400; color: var(--gray-light); margin-bottom: 36px; letter-spacing: 0.02em; transition: color 0.4s; }
   .hero-summary { font-size: 17px; line-height: 1.8; color: var(--text); margin-bottom: 44px; padding-left: 20px; border-left: 2px solid var(--accent); transition: color 0.4s; }
 
@@ -418,7 +433,7 @@
 <div class="hero" style="position:relative;z-index:1">
 
   <div class="hero-content">
-    <h1 class="hero-name">Yevhen<br><span class="surname">Biedniakov</span></h1>
+    <h1 class="hero-name"><span class="wave-name"><svg class="name-fill" aria-hidden="true" viewBox="-15.0 -785.0 4729.0 818.0"><defs><path id="yevhen-glyph" transform="scale(1,-1)" d="M2471.0 770.0V0.0H2725.0V274.0Q2725.0 310.0 2738.0 335.5Q2751.0 361.0 2775.5 374.5Q2800.0 388.0 2834.0 388.0Q2882.0 388.0 2908.5 362.0Q2935.0 336.0 2935.0 288.0V0.0H3189.0V324.0Q3189.0 405.0 3157.5 465.5Q3126.0 526.0 3067.0 559.5Q3008.0 593.0 2924.0 593.0Q2858.0 593.0 2801.0 562.0Q2758.209716796875 538.7280883789062 2725.0 497.7040710449219V770.0ZM1326.0 -18.0Q1421.0 -18.0 1496.5 3.0Q1572.0 24.0 1636.0 64.0V218.0Q1586.0 192.0 1527.0 178.0Q1468.0 164.0 1406.0 164.0Q1339.0 164.0 1295.0 181.0Q1257.6719970703125 195.4221954345703 1236.5377197265625 221.0H1650.0Q1650.0 335.0 1610.0 418.5Q1570.0 502.0 1495.0 547.5Q1420.0 593.0 1313.0 593.0Q1211.0 593.0 1129.0 555.0Q1047.0 517.0 999.5 449.0Q952.0 381.0 952.0 290.0Q952.0 198.0 1001.0 128.5Q1050.0 59.0 1134.5 20.5Q1219.0 -18.0 1326.0 -18.0ZM3599.0 -18.0Q3694.0 -18.0 3769.5 3.0Q3845.0 24.0 3909.0 64.0V218.0Q3859.0 192.0 3800.0 178.0Q3741.0 164.0 3679.0 164.0Q3612.0 164.0 3568.0 181.0Q3530.672119140625 195.422119140625 3509.537841796875 221.0H3923.0Q3923.0 335.0 3883.0 418.5Q3843.0 502.0 3768.0 547.5Q3693.0 593.0 3586.0 593.0Q3484.0 593.0 3402.0 555.0Q3320.0 517.0 3272.5 449.0Q3225.0 381.0 3225.0 290.0Q3225.0 198.0 3274.0 128.5Q3323.0 59.0 3407.5 20.5Q3492.0 -18.0 3599.0 -18.0ZM3941.0 575.0 3981.0 369.0V0.0H4235.0V274.0Q4235.0 310.0 4248.0 335.5Q4261.0 361.0 4285.5 374.5Q4310.0 388.0 4344.0 388.0Q4392.0 388.0 4418.5 362.0Q4445.0 336.0 4445.0 288.0V0.0H4699.0V324.0Q4699.0 405.0 4667.5 465.5Q4636.0 526.0 4577.0 559.5Q4518.0 593.0 4434.0 593.0Q4368.0 593.0 4311.0 562.0Q4254.0 531.0 4214.0 468.5Q4213.349609375 467.48406982421875 4212.7177734375 466.47796630859375L4195.0 575.0ZM350.0 0.0H608.0V303.0761413574219L956.0 750.0H673.0L478.3923645019531 498.108642578125L283.0 750.0H0.0L350.0 298.9873352050781ZM2052.956298828125 232.12765502929688 1924.0 575.0H1644.0L1905.0 0.0H2195.0L2456.0 575.0H2186.0L2052.956298828125 232.12765502929688ZM1218.0374755859375 360.0Q1219.6405029296875 363.556396484375 1221.5 367.0Q1235.0 392.0 1260.5 406.5Q1286.0 421.0 1323.0 421.0Q1355.0 421.0 1378.0 408.5Q1401.0 396.0 1415.5 372.0Q1418.938232421875 366.30914306640625 1421.7860107421875 360.0H1218.0374755859375ZM3491.03759765625 360.0Q3492.64111328125 363.5577392578125 3494.5 367.0Q3508.0 392.0 3533.5 406.5Q3559.0 421.0 3596.0 421.0Q3628.0 421.0 3651.0 408.5Q3674.0 396.0 3688.5 372.0Q3691.937744140625 366.3099365234375 3694.785888671875 360.0H3491.03759765625Z"/></defs><use href="#yevhen-glyph" fill="currentColor"/></svg><svg class="name-outline" role="img" aria-label="Yevhen" viewBox="-15.0 -785.0 4729.0 818.0"><use href="#yevhen-glyph" fill="none" stroke="currentColor" stroke-width="26" stroke-linejoin="round" stroke-linecap="round"/></svg></span><span class="surname">Biedniakov</span></h1>
     <p class="hero-role">Dental CAD/CAM Engineer · Implant &amp; Full-Arch Specialist · AI Automation</p>
     <p class="hero-summary">
       Dental CAD/CAM engineer with 7 years of digital manufacturing experience, specializing in
