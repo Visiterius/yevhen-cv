@@ -900,17 +900,11 @@
     ctx.restore();
   }
 
-  // Pause the drift + repaint when the hero is scrolled past — the grid lines stay
-  // visible (last frame persists in the canvas), but no work happens per frame.
-  let visible = true;
-  const hero = document.querySelector('.hero');
-  if ('IntersectionObserver' in window && hero) {
-    new IntersectionObserver(es => { visible = es[0].isIntersecting; }, { rootMargin: '120px' }).observe(hero);
-  }
+  // Grid runs continuously across the whole page (it's a lightweight 2D canvas);
+  // the browser already throttles rAF to ~1Hz when the tab is hidden.
   let last = performance.now();
   function loop(now) {
     const dt = Math.min((now-last)/1000, 0.05); last = now;
-    if (!visible || document.hidden) { requestAnimationFrame(loop); return; }
     const t = now * 0.001;
     ox = Math.sin(t * 0.16) * 48 + Math.sin(t * 0.06) * 24;
     oy = Math.cos(t * 0.13) * 42 + Math.cos(t * 0.045) * 22;
