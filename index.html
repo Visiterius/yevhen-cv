@@ -102,8 +102,6 @@
   }
 
   #circuit { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
-  #three-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0.85; }
-  #three-bg canvas { display: block; }
 
   model-viewer {
     width: 100%; height: 100%;
@@ -451,7 +449,6 @@
 <body>
 
 <canvas id="circuit"></canvas>
-<div id="three-bg"></div>
 <nav>
   <a href="#" class="nav-logo">YB · <span>AI</span></a>
   <ul class="nav-links">
@@ -999,108 +996,6 @@ window.addEventListener('scroll', () => {
 })();
 </script>
 
-<!-- ── THREE.JS SPINNING GLASS BACKGROUND ── -->
-<script type="importmap">
-{
-  "imports": {
-    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-  }
-}
-</script>
-<script type="module">
-import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-
-const container = document.getElementById('three-bg');
-if (container) {
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 1000);
-  camera.position.set(0, 0, 28);
-
-  const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false, powerPreference: 'high-performance' });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.25));
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.0;
-  container.appendChild(renderer.domElement);
-
-  // Environment for glass reflections
-  const pmremGenerator = new THREE.PMREMGenerator(renderer);
-  scene.environment = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
-
-  // Glass material
-  const glassMat = new THREE.MeshPhysicalMaterial({
-    color: 0xffffff,
-    metalness: 0,
-    roughness: 0.05,
-    transmission: 1.0,         // full transparency / refraction
-    transparent: true,
-    opacity: 0.10,             // very low opacity per request
-    ior: 1.45,
-    thickness: 0.5,
-    clearcoat: 1.0,
-    clearcoatRoughness: 0.1,
-    attenuationColor: new THREE.Color(0xffd519),
-    attenuationDistance: 2.5,
-    side: THREE.DoubleSide
-  });
-
-  let model;
-  const loader = new GLTFLoader();
-  loader.load('models/framework.glb', (gltf) => {
-    model = gltf.scene;
-    // Apply glass material to all meshes
-    model.traverse(child => {
-      if (child.isMesh) child.material = glassMat;
-    });
-
-    // Scale to fit viewport — make it BIG
-    const box = new THREE.Box3().setFromObject(model);
-    const size = box.getSize(new THREE.Vector3()).length();
-    const center = box.getCenter(new THREE.Vector3());
-    model.position.sub(center);
-    const scale = 15 / size;
-    model.scale.setScalar(scale);
-    // Shift to left-center area of viewport
-    model.position.x = -3.2;
-    // Initial perspective tilt — matches screenshot (looking down on the arch)
-    model.rotation.x = -Math.PI / 3;
-
-    scene.add(model);
-  });
-
-  // Subtle accent rim light
-  const rim = new THREE.DirectionalLight(0xffd519, 0.4);
-  rim.position.set(-5, 3, -5);
-  scene.add(rim);
-
-  // Pause the rotation + render when the hero section is scrolled out of view —
-  // backdrop-filter elements then stop repainting every frame.
-  let visible = true;
-  const hero = document.querySelector('.hero');
-  if ('IntersectionObserver' in window && hero) {
-    new IntersectionObserver(es => { visible = es[0].isIntersecting; }, { rootMargin: '120px' }).observe(hero);
-  }
-  function animate() {
-    requestAnimationFrame(animate);
-    if (!visible || document.hidden) return;          // skip the heavy frame
-    if (model) {
-      model.rotation.y += 0.0005;
-      model.rotation.x = -Math.PI / 3;
-    }
-    renderer.render(scene, camera);
-  }
-  animate();
-
-  window.addEventListener('resize', () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-  });
-}
-</script>
 <script>
 // ── LIQUID GLASS CARDS — rim specular + mac-OS spring tilt ──
 (function () {
